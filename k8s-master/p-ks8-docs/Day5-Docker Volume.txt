@@ -1,0 +1,942 @@
+
+Root disk
+data disk/External disk
+
+
+
+
+Volume : 
+
+    1)  HostPath
+    2) Native volume
+
+
+
+software related: commit
+user level related: need volume 
+[root@dockerhost ~]#
+[root@dockerhost ~]# ls /opt/docker/
+buildkit  containers  image  network  overlay2  plugins  runtimes  swarm  tmp  trust  volumes
+[root@dockerhost ~]#
+[root@dockerhost ~]# rm -rf  /var/lib/docker
+
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker images
+REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker pull ubuntu
+Using default tag: latest
+latest: Pulling from library/ubuntu
+2b55860d4c66: Pull complete
+Digest: sha256:20fa2d7bb4de7723f542be5923b06c4d704370f0390e4ae9e1c833c8785644c1
+Status: Downloaded newer image for ubuntu:latest
+docker.io/library/ubuntu:latest
+[root@dockerhost ~]#
+[root@dockerhost ~]# ls /opt/docker/overlay2/
+a9d5d73f55f9d346fb7832bcf77dfce7071eef8cbda08a6a43aaebfa3e4575b6  backingFsBlockDev  l
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# df -h  /opt/docker/
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/xvdf       8.0G  152M  7.9G   2% /opt/docker
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# df -h .
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/xvda1       10G  2.0G  8.1G  20% /
+[root@dockerhost ~]#
+[root@dockerhost ~]# clear
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker volume
+
+Usage:  docker volume COMMAND
+
+Manage volumes
+
+Commands:
+  create      Create a volume
+  inspect     Display detailed information on one or more volumes
+  ls          List volumes
+  prune       Remove all unused local volumes
+  rm          Remove one or more volumes
+
+Run 'docker volume COMMAND --help' for more information on a command.
+[root@dockerhost ~]# docker volume  ls
+[root@dockerhost ~]# docker volume  ls
+DRIVER    VOLUME NAME
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker volume create vol1
+vol1
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker volume  ls
+DRIVER    VOLUME NAME
+local     vol1
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker volume inspect vol1
+[
+    {
+        "CreatedAt": "2022-09-04T11:34:10Z",
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/opt/docker/volumes/vol1/_data",
+        "Name": "vol1",
+        "Options": {},
+        "Scope": "local"
+    }
+]
+[root@dockerhost ~]# ls /opt/docker/
+buildkit  containers  image  network  overlay2  plugins  runtimes  swarm  tmp  trust  volumes
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker run -d  -v  vol1:/usr/share/nginx/html  --name=web1 nginx
+Unable to find image 'nginx:latest' locally
+latest: Pulling from library/nginx
+7a6db449b51b: Pull complete
+ca1981974b58: Pull complete
+d4019c921e20: Pull complete
+7cb804d746d4: Pull complete
+e7a561826262: Pull complete
+7247f6e5c182: Pull complete
+Digest: sha256:b95a99feebf7797479e0c5eb5ec0bdfa5d9f504bc94da550c2f58e839ea6914f
+Status: Downloaded newer image for nginx:latest
+bc4a590d1fe60ded87e5de1d1b9cd2385034c2902ec4e56d8cd5273405d8abed
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker container  inspect  web1 | less
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# df -h  /opt/docker
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/xvdf       8.0G  266M  7.8G   4% /opt/docker
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker volume ls
+DRIVER    VOLUME NAME
+local     vol1
+[root@dockerhost ~]# docker volume create vol2 --size=4G
+unknown flag: --size
+See 'docker volume create --help'.
+[root@dockerhost ~]# docker volume create vol2
+vol2
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker volume ls
+DRIVER    VOLUME NAME
+local     vol1
+local     vol2
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker run -d  --name=mysql -v vol2:/var/lib/mysql  -e MYSQL_ROOT_PASSWORD=redhat mysql:5.6
+Unable to find image 'mysql:5.6' locally
+5.6: Pulling from library/mysql
+35b2232c987e: Pull complete
+fc55c00e48f2: Pull complete
+0030405130e3: Pull complete
+e1fef7f6a8d1: Pull complete
+1c76272398bb: Pull complete
+f57e698171b6: Pull complete
+f5b825b269c0: Pull complete
+dcb0af686073: Pull complete
+27bbfeb886d1: Pull complete
+6f70cc868145: Pull complete
+1f6637f4600d: Pull complete
+Digest: sha256:20575ecebe6216036d25dab5903808211f1e9ba63dc7825ac20cb975e34cfcae
+Status: Downloaded newer image for mysql:5.6
+75c9a2509c23f8e46b6e10105b4a3241358c90d13c58be6c192539454c271932
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker rm -f $(docker ps -q -a)
+75c9a2509c23
+bc4a590d1fe6
+[root@dockerhost ~]# docker volume ls
+DRIVER    VOLUME NAME
+local     vol1
+local     vol2
+[root@dockerhost ~]# docker volume rm  vol1
+vol1
+[root@dockerhost ~]# docker volume rm  vol3
+Error: No such volume: vol3
+[root@dockerhost ~]# docker volume rm  vol2
+vol2
+[root@dockerhost ~]# docker volume ls
+DRIVER    VOLUME NAME
+[root@dockerhost ~]#
+[root@dockerhost ~]# ls /opt/docker/volumes/
+backingFsBlockDev  metadata.db
+[root@dockerhost ~]# history
+    1  vi /etc/ssh/sshd_config
+    2  passwd root
+    3  cd /etc
+    4  l s-lrth
+    5  cd ssh
+    6  ls -lrth
+    7  vi sshd_config
+    8  vi /etc/ssh/sshd_config
+    9  systemctl status sshd
+   10  systemctl restart sshd
+   11  ls -lrtg
+   12  cd /
+   13  ls -lrth
+   14  um-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
+   15  yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
+   16  yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+   17  systmctl status docker
+   18  systemctl status docker
+   19  systemctl start docker
+   20  systemctl status docker
+   21  docker ps
+   22  show date
+   23  date
+   24  docker pull httpd
+   25  docker images
+   26  docker ps
+   27  docker run -d a981c8992512
+   28  docker ps
+   29   cd /var/lib
+   30  ls -lrth
+   31  cd docker
+   32  ls -lrth
+   33  docker -it a981c8992512 bash
+   34  ls -lrth
+   35  docker run -it httd sh
+   36  docker run -it a981c8992512 sh
+   37  docker ps
+   38  docker top 5e227d9cf378
+   39  docker ps df
+   40  docker 5e227d9cf378 df
+   41  docker ps
+   42  docker stop 5e227d9cf378
+   43  docker ps
+   44  docker ps -a
+   45  docker images
+   46  docker start
+   47  docker images
+   48  docker run
+   49  docket status
+   50  docker status
+   51  ls -lrth
+   52  cd /
+   53  docker images
+   54  sudo -i
+   55  docker images
+   56  ls -lrth
+   57  cd /
+   58  ls -lrth
+   59  cd var
+   60  ls -lrth
+   61  cd lib
+   62  ls -lrth
+   63  up
+   64  cd
+   65  cd lib
+   66  cd /
+   67  cd var/lib
+   68  cd docker
+   69  ls -lrth
+   70  cd overlay2/
+   71  ls -lrth
+   72  cd
+   73  cd /
+   74  docker images
+   75  systemctl status docker
+   76  systemctl start docker
+   77  systemctl status docker
+   78  docker images
+   79  docker pull ubuntu
+   80  docker run -it --name=demo ubuntu
+   81  docker images
+   82  docker commit demo apache2
+   83  docker images
+   84  docker rm demo
+   85  docker images
+   86  cd /
+   87  ls -lrth
+   88  systemctl status docker
+   89  docker images
+   90  docker ps
+   91  clear
+   92  lsblk
+   93  mkfs -t xfs /dev/xvdf
+   94  mkdir  /storage
+   95  mount /dev/xvdf  /storage/
+   96  df -h /storage/
+   97  docker pull  nginx
+   98  docker run  -d  --name=web  -v  /storage:/usr/share/nginx/html  nginx
+   99  docker ps
+  100  docker exec  -it web bash
+  101  ls  /storage/
+  102  cat /storage/
+  103  cat /storage/index.html
+  104  docker rm -f web
+  105  ls  /storage/
+  106  docker run  -d  --name=web  -v  /storage:/usr/share/nginx/html  nginx
+  107  docker exec -it web bash
+  108  docker run  -d  --name=web2  -v  /storage:/usr/share/nginx/html  nginx
+  109  docker exec -it web2 bash
+  110  docker run  -d  --name=web3   -v  /storage:/usr/share/nginx/html:ro  nginx
+  111  docker exec  -it web3 bash
+  112  docker rm -f $(docker ps -q -a)
+  113  rm -rf  /storage/*
+  114  mkdir  /storage/logs
+  115  mkdir  /storage/app
+  116  docker run -d --name=web   -v  /storage/app:/usr/share/nginx/html -v /storage/logs:/logs nginx
+  117  df -h  /storage/
+  118  lsblk
+  119  xfs_growfs   /storage/
+  120  df -h  /storage/
+  121  docker exec  -it web3 bash
+  122  docker exec  -it web bash
+  123  cd /storage/
+  124  ls
+  125  cd
+  126  docker exec  -it web bash
+  127  docker rm  -f $(docker ps -q -a)
+  128  docker run -it --name=demo -v /storage:/apps  ubuntu
+  129  docker commit demo apache2
+  130  docker rm -f demo
+  131  docker images
+  132  docker ps
+  133  docker rm -f  $(docker ps -q -a)
+  134  history
+  135  docker run -d --name=web   -v  /storage/app:/usr/share/nginx/html -v /storage/logs:/logs nginx
+  136  docker  exec -it web bash
+  137  history
+  138  docker  exec -it web bash
+  139  docker run -d --name=web4 nginx
+  140  df -h /
+  141  docker rm -f  $(docker ps -q -a)
+  142  rm -rf  /storage/*
+  143  umount /storage/
+  144  lsblk
+  145  mkdir  -p /opt/docker
+  146  systemctl status docker
+  147  vim /usr/lib/systemd/system/docker.service
+  148  vi  /usr/lib/systemd/system/docker.service
+  149  mount /dev/xvdf  /opt/docker/
+  150  systemctl daemon-reload
+  151  systemctl  restart docker
+  152  ls /opt/docker/
+  153  rm -rf  /var/lib/docker
+  154  docker images
+  155  docker pull ubuntu
+  156  ls /opt/docker/overlay2/
+  157  df -h  /opt/docker/
+  158  df -h .
+  159  clear
+  160  docker volume
+  161  docker volume  ls
+  162  docker volume create vol1
+  163  docker volume  ls
+  164  docker volume inspect vol1
+  165  ls /opt/docker/
+  166  docker run -d  -v  vol1:/usr/share/nginx/html  --name=web1 nginx
+  167  docker container  inspect  web1 | less
+  168  df -h  /opt/docker
+  169  docker volume ls
+  170  docker volume create vol2 --size=4G
+  171  docker volume create vol2
+  172  docker volume ls
+  173  docker run -d  --name=mysql -v vol2:/var/lib/mysql  -e MYSQL_ROOT_PASSWORD=redhat mysql:5.6
+  174  docker rm -f $(docker ps -q -a)
+  175  docker volume ls
+  176  docker volume rm  vol1
+  177  docker volume rm  vol3
+  178  docker volume rm  vol2
+  179  docker volume ls
+  180  ls /opt/docker/volumes/
+  181  history
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker volume create vol1
+vol1
+[root@dockerhost ~]# docker run -d  -v  vol1:/usr/share/nginx/html  --name=web1 nginx
+3dbe52bd2684e07d720e8633c0860f4d81d35c2349757c9b85bc2badd9130f7a
+^[[A[root@dockerhost ~]# docker run -d  -v  vol1:/usr/share/nginx/html:ro   --name=web2 nginx
+dd4c35274f82f328d121cf7661d575ea8c13a0c5ed4cc912000fcaf67ff8e920
+[root@dockerhost ~]# docker volume create apavhe
+apavhe
+[root@dockerhost ~]# docker volume create mysqlvol
+mysqlvol
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker volume ls
+DRIVER    VOLUME NAME
+local     apavhe
+local     mysqlvol
+local     vol1
+[root@dockerhost ~]# docker volume ls
+DRIVER    VOLUME NAME
+local     apavhe
+local     mysqlvol
+local     vol1
+[root@dockerhost ~]# ls /
+bin  boot  dev  etc  home  lib  lib64  media  mnt  opt  proc  root  run  sbin  srv  storage  sys  tmp  usr  var
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker rm -f  $(docker ps -q -a)
+dd4c35274f82
+3dbe52bd2684
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker volume prune
+WARNING! This will remove all local volumes not used by at least one container.
+Are you sure you want to continue? [y/N] y
+Deleted Volumes:
+vol1
+apavhe
+mysqlvol
+
+Total reclaimed space: 1.112kB
+[root@dockerhost ~]# docker volume ls
+DRIVER    VOLUME NAME
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker run -d --name=web   nginx
+d76de51a505052c02dcae973c257145bea72a8a42e915634cf590c3f727cd513
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker exec -it web bash
+root@d76de51a5050:/#
+root@d76de51a5050:/# echo  hellworld   > /run.sh
+root@d76de51a5050:/#
+root@d76de51a5050:/# exit
+exit
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker cp  web:/run.sh    /tmp
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# cat  /tmp/run.sh
+hellworld
+[root@dockerhost ~]#
+[root@dockerhost ~]# echo bash .   file.sh
+bash . file.sh
+[root@dockerhost ~]# echo bash>   file.sh
+[root@dockerhost ~]# echo bas >    file.sh
+[root@dockerhost ~]#
+[root@dockerhost ~]# cat file.sh
+bas
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker cp file.sh    web:/root
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker exec -it web bash
+root@d76de51a5050:/# cat /root/file.sh
+bas
+root@d76de51a5050:/# read escape sequence
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# df -h /
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/xvda1       10G  2.0G  8.1G  20% /
+[root@dockerhost ~]# df -TH /
+Filesystem     Type  Size  Used Avail Use% Mounted on
+/dev/xvda1     xfs    11G  2.1G  8.7G  20% /
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# yum install  nfs-utils  -y
+Loaded plugins: fastestmirror
+Loading mirror speeds from cached hostfile
+ * base: download.cf.centos.org
+ * extras: download.cf.centos.org
+ * updates: download.cf.centos.org
+base                                                                                                     | 3.6 kB  00:00:00
+docker-ce-stable                                                                                         | 3.5 kB  00:00:00
+extras                                                                                                   | 2.9 kB  00:00:00
+updates                                                                                                  | 2.9 kB  00:00:00
+(1/2): extras/7/x86_64/primary_db                                                                        | 250 kB  00:00:00
+(2/2): updates/7/x86_64/primary_db                                                                       |  17 MB  00:00:00
+Package 1:nfs-utils-1.3.0-0.68.el7.2.x86_64 already installed and latest version
+Nothing to do
+[root@dockerhost ~]# mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-0bbb4f3a94627574d.efs.ap-south-1.amazonaws.com:/ efs
+mount.nfs4: mount point efs does not exist
+[root@dockerhost ~]#
+[root@dockerhost ~]# mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-0bbb4f3a94627574d.efs.ap-south-1.amazonaws.com:/   /mnt
+
+
+^C
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-0bbb4f3a94627574d.efs.ap-south-1.amazonaws.com:/   /mnt
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# df  -h /mnt
+Filesystem                                           Size  Used Avail Use% Mounted on
+fs-0bbb4f3a94627574d.efs.ap-south-1.amazonaws.com:/  8.0E     0  8.0E   0% /mnt
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# mkdir  /mnt/logs
+[root@dockerhost ~]#
+[root@dockerhost ~]# mkdir  /mnt/oracle
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker run -d  --name=web1  -v  /mnt/oracle:/usr/share/nginx/html   nginx
+6ee1ac96642f616fad48dd1c4c67e7530ebd2b03e13fa0f5fe4df6cdbcc09c95
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker exec -it  web1 bash
+root@6ee1ac96642f:/# cd  usr/share/nginx/html/
+root@6ee1ac96642f:/usr/share/nginx/html# echo hellworld  > index.html
+root@6ee1ac96642f:/usr/share/nginx/html# exit
+exit
+[root@dockerhost ~]#
+[root@dockerhost ~]# umount  /mnt/
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# docker run -it  --name=demo  centos:7
+Unable to find image 'centos:7' locally
+7: Pulling from library/centos
+2d473b07cdd5: Pull complete
+Digest: sha256:c73f515d06b0fa07bb18d8202035e739a494ce760aa73129f60f4bf2bd22b407
+Status: Downloaded newer image for centos:7
+[root@09380cfbbc01 /]#
+[root@09380cfbbc01 /]#
+[root@09380cfbbc01 /]# yum install nfs-utls -y
+Loaded plugins: fastestmirror, ovl
+Determining fastest mirrors
+ * base: download.cf.centos.org
+ * extras: download.cf.centos.org
+ * updates: download.cf.centos.org
+base                                                                                                     | 3.6 kB  00:00:00
+extras                                                                                                   | 2.9 kB  00:00:00
+updates                                                                                                  | 2.9 kB  00:00:00
+(1/4): base/7/x86_64/group_gz                                                                            | 153 kB  00:00:00
+(2/4): extras/7/x86_64/primary_db                                                                        | 250 kB  00:00:00
+(3/4): updates/7/x86_64/primary_db                                                                       |  17 MB  00:00:00
+^C/4): base/7/x86_64/primary_db                   74% [=============================          ]  0.0 B/s |  18 MB  --:--:-- ETA
+
+Exiting on user cancel
+[root@09380cfbbc01 /]# yum install nfs-utils -y
+Loaded plugins: fastestmirror, ovl
+Loading mirror speeds from cached hostfile
+ * base: download.cf.centos.org
+ * extras: download.cf.centos.org
+ * updates: download.cf.centos.org
+base/7/x86_64/primary_db                                                                                 | 6.1 MB  00:00:00
+Resolving Dependencies
+--> Running transaction check
+---> Package nfs-utils.x86_64 1:1.3.0-0.68.el7.2 will be installed
+--> Processing Dependency: libtirpc >= 0.2.4-0.7 for package: 1:nfs-utils-1.3.0-0.68.el7.2.x86_64
+--> Processing Dependency: gssproxy >= 0.7.0-3 for package: 1:nfs-utils-1.3.0-0.68.el7.2.x86_64
+--> Processing Dependency: rpcbind for package: 1:nfs-utils-1.3.0-0.68.el7.2.x86_64
+--> Processing Dependency: quota for package: 1:nfs-utils-1.3.0-0.68.el7.2.x86_64
+--> Processing Dependency: libnfsidmap for package: 1:nfs-utils-1.3.0-0.68.el7.2.x86_64
+--> Processing Dependency: libevent for package: 1:nfs-utils-1.3.0-0.68.el7.2.x86_64
+--> Processing Dependency: keyutils for package: 1:nfs-utils-1.3.0-0.68.el7.2.x86_64
+--> Processing Dependency: libwrap.so.0()(64bit) for package: 1:nfs-utils-1.3.0-0.68.el7.2.x86_64
+--> Processing Dependency: libtirpc.so.1()(64bit) for package: 1:nfs-utils-1.3.0-0.68.el7.2.x86_64
+--> Processing Dependency: libnfsidmap.so.0()(64bit) for package: 1:nfs-utils-1.3.0-0.68.el7.2.x86_64
+--> Processing Dependency: libevent-2.0.so.5()(64bit) for package: 1:nfs-utils-1.3.0-0.68.el7.2.x86_64
+--> Running transaction check
+---> Package gssproxy.x86_64 0:0.7.0-30.el7_9 will be installed
+--> Processing Dependency: libini_config >= 1.3.1-31 for package: gssproxy-0.7.0-30.el7_9.x86_64
+--> Processing Dependency: libverto-module-base for package: gssproxy-0.7.0-30.el7_9.x86_64
+--> Processing Dependency: libref_array.so.1(REF_ARRAY_0.1.1)(64bit) for package: gssproxy-0.7.0-30.el7_9.x86_64
+--> Processing Dependency: libini_config.so.3(INI_CONFIG_1.2.0)(64bit) for package: gssproxy-0.7.0-30.el7_9.x86_64
+--> Processing Dependency: libini_config.so.3(INI_CONFIG_1.1.0)(64bit) for package: gssproxy-0.7.0-30.el7_9.x86_64
+--> Processing Dependency: libref_array.so.1()(64bit) for package: gssproxy-0.7.0-30.el7_9.x86_64
+--> Processing Dependency: libini_config.so.3()(64bit) for package: gssproxy-0.7.0-30.el7_9.x86_64
+--> Processing Dependency: libcollection.so.2()(64bit) for package: gssproxy-0.7.0-30.el7_9.x86_64
+--> Processing Dependency: libbasicobjects.so.0()(64bit) for package: gssproxy-0.7.0-30.el7_9.x86_64
+---> Package keyutils.x86_64 0:1.5.8-3.el7 will be installed
+---> Package libevent.x86_64 0:2.0.21-4.el7 will be installed
+---> Package libnfsidmap.x86_64 0:0.25-19.el7 will be installed
+---> Package libtirpc.x86_64 0:0.2.4-0.16.el7 will be installed
+---> Package quota.x86_64 1:4.01-19.el7 will be installed
+--> Processing Dependency: quota-nls = 1:4.01-19.el7 for package: 1:quota-4.01-19.el7.x86_64
+--> Processing Dependency: tcp_wrappers for package: 1:quota-4.01-19.el7.x86_64
+--> Processing Dependency: libext2fs.so.2()(64bit) for package: 1:quota-4.01-19.el7.x86_64
+---> Package rpcbind.x86_64 0:0.2.0-49.el7 will be installed
+--> Processing Dependency: systemd-sysv for package: rpcbind-0.2.0-49.el7.x86_64
+---> Package tcp_wrappers-libs.x86_64 0:7.6-77.el7 will be installed
+--> Running transaction check
+---> Package e2fsprogs-libs.x86_64 0:1.42.9-19.el7 will be installed
+---> Package libbasicobjects.x86_64 0:0.1.1-32.el7 will be installed
+---> Package libcollection.x86_64 0:0.7.0-32.el7 will be installed
+---> Package libini_config.x86_64 0:1.3.1-32.el7 will be installed
+--> Processing Dependency: libpath_utils.so.1(PATH_UTILS_0.2.1)(64bit) for package: libini_config-1.3.1-32.el7.x86_64
+--> Processing Dependency: libpath_utils.so.1()(64bit) for package: libini_config-1.3.1-32.el7.x86_64
+---> Package libref_array.x86_64 0:0.1.5-32.el7 will be installed
+---> Package libverto-libevent.x86_64 0:0.2.5-4.el7 will be installed
+---> Package quota-nls.noarch 1:4.01-19.el7 will be installed
+---> Package systemd-sysv.x86_64 0:219-78.el7_9.7 will be installed
+--> Processing Dependency: systemd = 219-78.el7_9.7 for package: systemd-sysv-219-78.el7_9.7.x86_64
+---> Package tcp_wrappers.x86_64 0:7.6-77.el7 will be installed
+--> Running transaction check
+---> Package libpath_utils.x86_64 0:0.2.1-32.el7 will be installed
+---> Package systemd.x86_64 0:219-78.el7 will be updated
+---> Package systemd.x86_64 0:219-78.el7_9.7 will be an update
+--> Processing Dependency: systemd-libs = 219-78.el7_9.7 for package: systemd-219-78.el7_9.7.x86_64
+--> Running transaction check
+---> Package systemd-libs.x86_64 0:219-78.el7 will be updated
+---> Package systemd-libs.x86_64 0:219-78.el7_9.7 will be an update
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+================================================================================================================================
+ Package                            Arch                    Version                              Repository                Size
+================================================================================================================================
+Installing:
+ nfs-utils                          x86_64                  1:1.3.0-0.68.el7.2                   updates                  413 k
+Installing for dependencies:
+ e2fsprogs-libs                     x86_64                  1.42.9-19.el7                        base                     168 k
+ gssproxy                           x86_64                  0.7.0-30.el7_9                       updates                  111 k
+ keyutils                           x86_64                  1.5.8-3.el7                          base                      54 k
+ libbasicobjects                    x86_64                  0.1.1-32.el7                         base                      26 k
+ libcollection                      x86_64                  0.7.0-32.el7                         base                      42 k
+ libevent                           x86_64                  2.0.21-4.el7                         base                     214 k
+ libini_config                      x86_64                  1.3.1-32.el7                         base                      64 k
+ libnfsidmap                        x86_64                  0.25-19.el7                          base                      50 k
+ libpath_utils                      x86_64                  0.2.1-32.el7                         base                      28 k
+ libref_array                       x86_64                  0.1.5-32.el7                         base                      27 k
+ libtirpc                           x86_64                  0.2.4-0.16.el7                       base                      89 k
+ libverto-libevent                  x86_64                  0.2.5-4.el7                          base                     8.9 k
+ quota                              x86_64                  1:4.01-19.el7                        base                     179 k
+ quota-nls                          noarch                  1:4.01-19.el7                        base                      90 k
+ rpcbind                            x86_64                  0.2.0-49.el7                         base                      60 k
+ systemd-sysv                       x86_64                  219-78.el7_9.7                       updates                   97 k
+ tcp_wrappers                       x86_64                  7.6-77.el7                           base                      78 k
+ tcp_wrappers-libs                  x86_64                  7.6-77.el7                           base                      66 k
+Updating for dependencies:
+ systemd                            x86_64                  219-78.el7_9.7                       updates                  5.1 M
+ systemd-libs                       x86_64                  219-78.el7_9.7                       updates                  419 k
+
+Transaction Summary
+================================================================================================================================
+Install  1 Package  (+18 Dependent packages)
+Upgrade             (  2 Dependent packages)
+
+Total download size: 7.3 M
+Downloading packages:
+Delta RPMs disabled because /usr/bin/applydeltarpm not installed.
+warning: /var/cache/yum/x86_64/7/base/packages/e2fsprogs-libs-1.42.9-19.el7.x86_64.rpm: Header V3 RSA/SHA256 Signature, key ID f4a80eb5: NOKEY
+Public key for e2fsprogs-libs-1.42.9-19.el7.x86_64.rpm is not installed
+(1/21): e2fsprogs-libs-1.42.9-19.el7.x86_64.rpm                                                          | 168 kB  00:00:00
+(2/21): libbasicobjects-0.1.1-32.el7.x86_64.rpm                                                          |  26 kB  00:00:00
+(3/21): libcollection-0.7.0-32.el7.x86_64.rpm                                                            |  42 kB  00:00:00
+(4/21): libevent-2.0.21-4.el7.x86_64.rpm                                                                 | 214 kB  00:00:00
+(5/21): libini_config-1.3.1-32.el7.x86_64.rpm                                                            |  64 kB  00:00:00
+(6/21): libnfsidmap-0.25-19.el7.x86_64.rpm                                                               |  50 kB  00:00:00
+(7/21): libpath_utils-0.2.1-32.el7.x86_64.rpm                                                            |  28 kB  00:00:00
+(8/21): libref_array-0.1.5-32.el7.x86_64.rpm                                                             |  27 kB  00:00:00
+(9/21): libtirpc-0.2.4-0.16.el7.x86_64.rpm                                                               |  89 kB  00:00:00
+(10/21): keyutils-1.5.8-3.el7.x86_64.rpm                                                                 |  54 kB  00:00:00
+(11/21): libverto-libevent-0.2.5-4.el7.x86_64.rpm                                                        | 8.9 kB  00:00:00
+(12/21): quota-4.01-19.el7.x86_64.rpm                                                                    | 179 kB  00:00:00
+(13/21): rpcbind-0.2.0-49.el7.x86_64.rpm                                                                 |  60 kB  00:00:00
+Public key for gssproxy-0.7.0-30.el7_9.x86_64.rpm is not installed
+(14/21): gssproxy-0.7.0-30.el7_9.x86_64.rpm                                                              | 111 kB  00:00:00
+(15/21): systemd-219-78.el7_9.7.x86_64.rpm                                                               | 5.1 MB  00:00:00
+(16/21): systemd-libs-219-78.el7_9.7.x86_64.rpm                                                          | 419 kB  00:00:00
+(17/21): systemd-sysv-219-78.el7_9.7.x86_64.rpm                                                          |  97 kB  00:00:00
+(18/21): nfs-utils-1.3.0-0.68.el7.2.x86_64.rpm                                                           | 413 kB  00:00:00
+(19/21): quota-nls-4.01-19.el7.noarch.rpm                                                                |  90 kB  00:00:00
+(20/21): tcp_wrappers-7.6-77.el7.x86_64.rpm                                                              |  78 kB  00:00:01
+(21/21): tcp_wrappers-libs-7.6-77.el7.x86_64.rpm                                                         |  66 kB  00:00:01
+--------------------------------------------------------------------------------------------------------------------------------
+Total                                                                                           3.1 MB/s | 7.3 MB  00:00:02
+Retrieving key from file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+Importing GPG key 0xF4A80EB5:
+ Userid     : "CentOS-7 Key (CentOS 7 Official Signing Key) <security@centos.org>"
+ Fingerprint: 6341 ab27 53d7 8a78 a7c2 7bb1 24c6 a8a7 f4a8 0eb5
+ Package    : centos-release-7-9.2009.0.el7.centos.x86_64 (@CentOS)
+ From       : /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Installing : tcp_wrappers-libs-7.6-77.el7.x86_64                                                                         1/23
+  Installing : libref_array-0.1.5-32.el7.x86_64                                                                            2/23
+  Installing : libcollection-0.7.0-32.el7.x86_64                                                                           3/23
+  Installing : libevent-2.0.21-4.el7.x86_64                                                                                4/23
+  Installing : libbasicobjects-0.1.1-32.el7.x86_64                                                                         5/23
+  Updating   : systemd-libs-219-78.el7_9.7.x86_64                                                                          6/23
+  Updating   : systemd-219-78.el7_9.7.x86_64                                                                               7/23
+Failed to get D-Bus connection: Operation not permitted
+  Installing : libtirpc-0.2.4-0.16.el7.x86_64                                                                              8/23
+  Installing : systemd-sysv-219-78.el7_9.7.x86_64                                                                          9/23
+  Installing : rpcbind-0.2.0-49.el7.x86_64                                                                                10/23
+  Installing : libverto-libevent-0.2.5-4.el7.x86_64                                                                       11/23
+  Installing : tcp_wrappers-7.6-77.el7.x86_64                                                                             12/23
+  Installing : 1:quota-nls-4.01-19.el7.noarch                                                                             13/23
+  Installing : keyutils-1.5.8-3.el7.x86_64                                                                                14/23
+  Installing : libnfsidmap-0.25-19.el7.x86_64                                                                             15/23
+  Installing : libpath_utils-0.2.1-32.el7.x86_64                                                                          16/23
+  Installing : libini_config-1.3.1-32.el7.x86_64                                                                          17/23
+  Installing : gssproxy-0.7.0-30.el7_9.x86_64                                                                             18/23
+  Installing : e2fsprogs-libs-1.42.9-19.el7.x86_64                                                                        19/23
+  Installing : 1:quota-4.01-19.el7.x86_64                                                                                 20/23
+  Installing : 1:nfs-utils-1.3.0-0.68.el7.2.x86_64                                                                        21/23
+  Cleanup    : systemd-219-78.el7.x86_64                                                                                  22/23
+  Cleanup    : systemd-libs-219-78.el7.x86_64                                                                             23/23
+  Verifying  : libtirpc-0.2.4-0.16.el7.x86_64                                                                              1/23
+  Verifying  : gssproxy-0.7.0-30.el7_9.x86_64                                                                              2/23
+  Verifying  : systemd-libs-219-78.el7_9.7.x86_64                                                                          3/23
+  Verifying  : systemd-219-78.el7_9.7.x86_64                                                                               4/23
+  Verifying  : tcp_wrappers-libs-7.6-77.el7.x86_64                                                                         5/23
+  Verifying  : libbasicobjects-0.1.1-32.el7.x86_64                                                                         6/23
+  Verifying  : 1:nfs-utils-1.3.0-0.68.el7.2.x86_64                                                                         7/23
+  Verifying  : rpcbind-0.2.0-49.el7.x86_64                                                                                 8/23
+  Verifying  : libini_config-1.3.1-32.el7.x86_64                                                                           9/23
+  Verifying  : e2fsprogs-libs-1.42.9-19.el7.x86_64                                                                        10/23
+  Verifying  : libevent-2.0.21-4.el7.x86_64                                                                               11/23
+  Verifying  : libverto-libevent-0.2.5-4.el7.x86_64                                                                       12/23
+  Verifying  : systemd-sysv-219-78.el7_9.7.x86_64                                                                         13/23
+  Verifying  : libcollection-0.7.0-32.el7.x86_64                                                                          14/23
+  Verifying  : libref_array-0.1.5-32.el7.x86_64                                                                           15/23
+  Verifying  : libpath_utils-0.2.1-32.el7.x86_64                                                                          16/23
+  Verifying  : 1:quota-4.01-19.el7.x86_64                                                                                 17/23
+  Verifying  : libnfsidmap-0.25-19.el7.x86_64                                                                             18/23
+  Verifying  : keyutils-1.5.8-3.el7.x86_64                                                                                19/23
+  Verifying  : tcp_wrappers-7.6-77.el7.x86_64                                                                             20/23
+  Verifying  : 1:quota-nls-4.01-19.el7.noarch                                                                             21/23
+  Verifying  : systemd-libs-219-78.el7.x86_64                                                                             22/23
+  Verifying  : systemd-219-78.el7.x86_64                                                                                  23/23
+
+Installed:
+  nfs-utils.x86_64 1:1.3.0-0.68.el7.2
+
+Dependency Installed:
+  e2fsprogs-libs.x86_64 0:1.42.9-19.el7     gssproxy.x86_64 0:0.7.0-30.el7_9        keyutils.x86_64 0:1.5.8-3.el7
+  libbasicobjects.x86_64 0:0.1.1-32.el7     libcollection.x86_64 0:0.7.0-32.el7     libevent.x86_64 0:2.0.21-4.el7
+  libini_config.x86_64 0:1.3.1-32.el7       libnfsidmap.x86_64 0:0.25-19.el7        libpath_utils.x86_64 0:0.2.1-32.el7
+  libref_array.x86_64 0:0.1.5-32.el7        libtirpc.x86_64 0:0.2.4-0.16.el7        libverto-libevent.x86_64 0:0.2.5-4.el7
+  quota.x86_64 1:4.01-19.el7                quota-nls.noarch 1:4.01-19.el7          rpcbind.x86_64 0:0.2.0-49.el7
+  systemd-sysv.x86_64 0:219-78.el7_9.7      tcp_wrappers.x86_64 0:7.6-77.el7        tcp_wrappers-libs.x86_64 0:7.6-77.el7
+
+Dependency Updated:
+  systemd.x86_64 0:219-78.el7_9.7                              systemd-libs.x86_64 0:219-78.el7_9.7
+
+Complete!
+[root@09380cfbbc01 /]# mkdir  /data
+[root@09380cfbbc01 /]#
+[root@09380cfbbc01 /]# mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-0bbb4f3a94627574d.efs.ap-south-1.amazonaws.com:/   /data
+mount.nfs4: Operation not permitted
+[root@09380cfbbc01 /]# exit
+exit
+[root@dockerhost ~]#
+[root@dockerhost ~]#
+[root@dockerhost ~]# history
+    1  vi /etc/ssh/sshd_config
+    2  passwd root
+    3  cd /etc
+    4  l s-lrth
+    5  cd ssh
+    6  ls -lrth
+    7  vi sshd_config
+    8  vi /etc/ssh/sshd_config
+    9  systemctl status sshd
+   10  systemctl restart sshd
+   11  ls -lrtg
+   12  cd /
+   13  ls -lrth
+   14  um-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
+   15  yum-config-manager     --add-repo     https://download.docker.com/linux/centos/docker-ce.repo
+   16  yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+   17  systmctl status docker
+   18  systemctl status docker
+   19  systemctl start docker
+   20  systemctl status docker
+   21  docker ps
+   22  show date
+   23  date
+   24  docker pull httpd
+   25  docker images
+   26  docker ps
+   27  docker run -d a981c8992512
+   28  docker ps
+   29   cd /var/lib
+   30  ls -lrth
+   31  cd docker
+   32  ls -lrth
+   33  docker -it a981c8992512 bash
+   34  ls -lrth
+   35  docker run -it httd sh
+   36  docker run -it a981c8992512 sh
+   37  docker ps
+   38  docker top 5e227d9cf378
+   39  docker ps df
+   40  docker 5e227d9cf378 df
+   41  docker ps
+   42  docker stop 5e227d9cf378
+   43  docker ps
+   44  docker ps -a
+   45  docker images
+   46  docker start
+   47  docker images
+   48  docker run
+   49  docket status
+   50  docker status
+   51  ls -lrth
+   52  cd /
+   53  docker images
+   54  sudo -i
+   55  docker images
+   56  ls -lrth
+   57  cd /
+   58  ls -lrth
+   59  cd var
+   60  ls -lrth
+   61  cd lib
+   62  ls -lrth
+   63  up
+   64  cd
+   65  cd lib
+   66  cd /
+   67  cd var/lib
+   68  cd docker
+   69  ls -lrth
+   70  cd overlay2/
+   71  ls -lrth
+   72  cd
+   73  cd /
+   74  docker images
+   75  systemctl status docker
+   76  systemctl start docker
+   77  systemctl status docker
+   78  docker images
+   79  docker pull ubuntu
+   80  docker run -it --name=demo ubuntu
+   81  docker images
+   82  docker commit demo apache2
+   83  docker images
+   84  docker rm demo
+   85  docker images
+   86  cd /
+   87  ls -lrth
+   88  systemctl status docker
+   89  docker images
+   90  docker ps
+   91  clear
+   92  lsblk
+   93  mkfs -t xfs /dev/xvdf
+   94  mkdir  /storage
+   95  mount /dev/xvdf  /storage/
+   96  df -h /storage/
+   97  docker pull  nginx
+   98  docker run  -d  --name=web  -v  /storage:/usr/share/nginx/html  nginx
+   99  docker ps
+  100  docker exec  -it web bash
+  101  ls  /storage/
+  102  cat /storage/
+  103  cat /storage/index.html
+  104  docker rm -f web
+  105  ls  /storage/
+  106  docker run  -d  --name=web  -v  /storage:/usr/share/nginx/html  nginx
+  107  docker exec -it web bash
+  108  docker run  -d  --name=web2  -v  /storage:/usr/share/nginx/html  nginx
+  109  docker exec -it web2 bash
+  110  docker run  -d  --name=web3   -v  /storage:/usr/share/nginx/html:ro  nginx
+  111  docker exec  -it web3 bash
+  112  docker rm -f $(docker ps -q -a)
+  113  rm -rf  /storage/*
+  114  mkdir  /storage/logs
+  115  mkdir  /storage/app
+  116  docker run -d --name=web   -v  /storage/app:/usr/share/nginx/html -v /storage/logs:/logs nginx
+  117  df -h  /storage/
+  118  lsblk
+  119  xfs_growfs   /storage/
+  120  df -h  /storage/
+  121  docker exec  -it web3 bash
+  122  docker exec  -it web bash
+  123  cd /storage/
+  124  ls
+  125  cd
+  126  docker exec  -it web bash
+  127  docker rm  -f $(docker ps -q -a)
+  128  docker run -it --name=demo -v /storage:/apps  ubuntu
+  129  docker commit demo apache2
+  130  docker rm -f demo
+  131  docker images
+  132  docker ps
+  133  docker rm -f  $(docker ps -q -a)
+  134  history
+  135  docker run -d --name=web   -v  /storage/app:/usr/share/nginx/html -v /storage/logs:/logs nginx
+  136  docker  exec -it web bash
+  137  history
+  138  docker  exec -it web bash
+  139  docker run -d --name=web4 nginx
+  140  df -h /
+  141  docker rm -f  $(docker ps -q -a)
+  142  rm -rf  /storage/*
+  143  umount /storage/
+  144  lsblk
+  145  mkdir  -p /opt/docker
+  146  systemctl status docker
+  147  vim /usr/lib/systemd/system/docker.service
+  148  vi  /usr/lib/systemd/system/docker.service
+  149  mount /dev/xvdf  /opt/docker/
+  150  systemctl daemon-reload
+  151  systemctl  restart docker
+  152  ls /opt/docker/
+  153  rm -rf  /var/lib/docker
+  154  docker images
+  155  docker pull ubuntu
+  156  ls /opt/docker/overlay2/
+  157  df -h  /opt/docker/
+  158  df -h .
+  159  clear
+  160  docker volume
+  161  docker volume  ls
+  162  docker volume create vol1
+  163  docker volume  ls
+  164  docker volume inspect vol1
+  165  ls /opt/docker/
+  166  docker run -d  -v  vol1:/usr/share/nginx/html  --name=web1 nginx
+  167  docker container  inspect  web1 | less
+  168  df -h  /opt/docker
+  169  docker volume ls
+  170  docker volume create vol2 --size=4G
+  171  docker volume create vol2
+  172  docker volume ls
+  173  docker run -d  --name=mysql -v vol2:/var/lib/mysql  -e MYSQL_ROOT_PASSWORD=redhat mysql:5.6
+  174  docker rm -f $(docker ps -q -a)
+  175  docker volume ls
+  176  docker volume rm  vol1
+  177  docker volume rm  vol3
+  178  docker volume rm  vol2
+  179  docker volume ls
+  180  ls /opt/docker/volumes/
+  181  history
+  182  docker volume create vol1
+  183  docker run -d  -v  vol1:/usr/share/nginx/html  --name=web1 nginx
+  184  docker run -d  -v  vol1:/usr/share/nginx/html:ro   --name=web2 nginx
+  185  docker volume create apavhe
+  186  docker volume create mysqlvol
+  187  docker volume ls
+  188  ls /
+  189  docker rm -f  $(docker ps -q -a)
+  190  docker volume prune
+  191  docker volume ls
+  192  docker run -d --name=web   nginx
+  193  docker exec -it web bash
+  194  docker cp  web:/run.sh    /tmp
+  195  cat  /tmp/run.sh
+  196  echo bash .   file.sh
+  197  echo bash>   file.sh
+  198  echo bas >    file.sh
+  199  cat file.sh
+  200  docker cp file.sh    web:/root
+  201  docker exec -it web bash
+  202  df -h /
+  203  df -TH /
+  204  yum install  nfs-utils  -y
+  205  mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-0bbb4f3a94627574d.efs.ap-south-1.amazonaws.com:/ efs
+  206  mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport fs-0bbb4f3a94627574d.efs.ap-south-1.amazonaws.com:/   /mnt
+  207  df  -h /mnt
+  208  mkdir  /mnt/logs
+  209  mkdir  /mnt/oracle
+  210  docker run -d  --name=web1  -v  /mnt/oracle:/usr/share/nginx/html   nginx
+  211  docker exec -it  web1 bash
+  212  umount  /mnt/
+  213  docker run -it  --name=demo  centos:7
+  214  history
+[root@dockerhost ~]#

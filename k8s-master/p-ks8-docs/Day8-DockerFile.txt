@@ -1,0 +1,81 @@
+Build Images:
+
+1. Manually image build 
+	
+	1. Not recomended in industry.
+
+2. Automatically: Dockerfile
+
+FROM  centos:7
+RUN   yum install httpd python36 -y
+RUN  sed -i "s/Listen 80/Listen 8080/g" /etc/httpd/conf/httpd.conf
+RUN echo "print('Hello, world!')" >  mail.py  &&  chmod u+x mail.py
+COPY  src/  /var/www/html/
+RUN chown apache:apache  /var/run/httpd  /var/log/httpd
+RUN chmod  -R 777  /var/run/httpd  /var/log/httpd
+EXPOSE 8080
+USER apache
+CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
+
+FROM		--> It containts base image refrence, it is mandatory 
+LABEL		--> You can pass like manterner, creator user, emailID etc info.
+RUN		--> I can execute what ever command you give me, like software installation etc. 
+ADD		--> I just copy data inside image layer: data source might be localmachine/Internet(Like URL and tar file etc.) 
+
+		1. Download file/URL while copy does not.
+		2. Add has pre-reserve permission of data while copy only files not persmission. 
+		3. It has d-compression while copy does not.
+		
+COPY		--> I just copy data inside the image from local machine only and container will set the file permission. Could not copy localmachine permission. It can not extrect any data, it just copy only tar file.
+
+ENV		--> It is use to pass the environment variable.
+WORKDIR		--> It change the current working dir inside the container.
+		
+		1. RelativePath touch /opt/test/abc
+		2. AbsuletePath cd /opt/test 
+
+VOLUME		--> If your are not provide external volume. It can create volume at the image creation time from the Dockerfile.
+EXPOSE		--> You can expose container port at the image creation time.
+USER		--> who is take ownership for this container process: by default is goes to root account.
+
+		1. If you dont't want to create root previlage container with the USER you can make root less container.
+
+CMD		--> It basically execute command when container bootup.
+
+		1. Sets default parameters that can be overridden from the Docker Command Line Interface (CLI) when a container is running.
+		2. Ideally, there should be a single CMD command within a Dockerfile.
+		3. For instances where there are multiple CMD commands in a Dockerfile, all except the last one are ignored for an execution.
+		4. A Docker CMD instruction can be written in both Shell and Exec forms as:
+
+			CMD form: CMD [“executable”, “parameter1”, “parameter2”] --> CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"]
+			Shell form: CMD command parameter1 parameter2 --> CMD /usr/sbin/httpd -D FOREGROUND --> docker ps --> "/bin/sh -c '/usr/sbin/httpd -D FOREGROUND'"
+		5. When you create container you can overwrite the CMD values. If you not provide CMD valume on container creation time. it took default valuse from image.
+
+RUN: I execute commands on image build time: docker build -t
+VS
+CMD: Once image has builded, now you are creationg container. then container bootup i will put this commands
+
+
+
+ENTRYPOINT	--> When you create container you can't overwrite the CMD values. 
+
+		1. Default parameters that cannot be overridden when Docker Containers run with CLI parameters.
+		2. You can not put below entry in Dockerfile except step 4.
+			CMD form: ENTRYPOINT [“executable”, “parameter1”, “parameter2”] --> ENTRYPOINT ["/usr/sbin/httpd", "-D", "FOREGROUND"]
+			CMD form: CMD [“executable”, “parameter1”, “parameter2”] --> CMD ["/usr/sbin/httpd", "-D", "FOREGROUND"] 
+
+1. NO
+CMD
+CMD
+
+2. NO
+ENTRYPOINT
+ENTRYPOINT
+
+3. NO
+CMD
+ENTRYPOINT 
+
+4. YES
+ENTRYPOINT: If you want to pass primary command
+CMD: 

@@ -1,0 +1,73 @@
+Docker networking / Container Networking ;
+
+1) each container  should have the   unique ipaddress.  (True)
+
+2) two container should be communicate to each other .  (True)
+
+3) container should be go out side the docker machine .  (True)
+
+
+
+Note:
+
+1) Container  network by default works on Bridge Network concept.
+
+2) Bridge: it is software define network which works l2 switch for container .
+
+3) During the installation Bridge plugin already has  installed .
+
+4) docker system already has create one bridge network after installation with 172.17.0.0/16 subnet range
+
+
+5)  external users want to reach your container .
+
+Note: By deafult container IP address is kind of private IP which can access only from docker machine.
+
+	1. Configure Route tables: Which is not recomeded 
+	2. Port Forwarding: 
+	# docker run -d --name=web -p 8080:80 nginx
+	# docker run -d --name=web -p 192.168.44.40:8081:80 nginx
+	# docker run -d --name=web -p 192.168.44.40:8082:80 -p 8083:81 -p 8084:82 nginx
+
+Port Forwarding have 2 types:
+
+	1. Static Port forwarding: -p hostport:containerport.
+	2. Dynamic Port forwaring: -P no need to give any port number, it autmaticaly took any rendom port.
+
+Bridge Network:
+
+	1. All they have IP address.
+	2. All they can communicate to each other.
+	3. They can go outside the docker host via docker base machine IP address.
+	4. Via Port forwarding can access external client.
+
+Host Networking:
+	
+	1. It directly connect with you base machine interfaces.
+	2. It have IP address which is running dcoker machine interface.
+	3. container can directly reach by host machine IP adrress.
+	4. but same container can't run at a time. but old container also took the ports. 
+	5. This network you can use for SRI-OV base containers. 
+
+None Networking:
+
+	1. If you want to test you container without network use NONE networking.
+	2. 
+
+6) I want to intregrate balancer across the container.
+	
+	1. You can use HAPROXY as a software loadbalancer.
+	2. AWS loadbalancer --> Application loadbalancer --> use internet, zone map, security group, create target group (and add you VM 
+give name in target and create, select port numbers, use include option. create target group and check on LB tab --> provide target group and create LB.
+
+7) DNS system
+
+	1. container can connect via name, if any container get reboot(IP will be changed), other conatiner can connect with same conatiner with name only. because after reboot container IP always changed.
+
+	2. Example: create one network with bridge.
+	3. Example: create 2 conatiner one for mysql 2 for wordpress app and check.
+
+
+
+
+
